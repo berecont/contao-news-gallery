@@ -1,0 +1,88 @@
+<?php
+
+$name = \NewsModel::findById($this->id)->getRelated('author')->name;
+
+?>
+
+<div class="container">
+    <div class="layout_full row block<?= $this->class ?>">
+        <div class="col-lg-3">
+        <?php if ($this->addGallery): ?>
+
+        <?php  
+
+        $files = array_map('\StringUtil::binToUuid', deserialize($this->orderSRC, true));
+       
+        //foreach ($files as $data) {
+        //$objFile = \Contao\FilesModel::findByUuid($data);
+
+        //echo $objFile->path . '<br>';
+        //};
+
+        
+        ?>
+        <div class="row">
+            <?php foreach ($files as $data): $objFile = \Contao\FilesModel::findByUuid($data); ?>
+            <div class="col-6">
+                <figure class="image_container">
+                    <a href="<?= $objFile->path ?>" class="cboxElement" data-lightbox="lightbox[<?= $this->id ?>]">
+                        <img src="<?= $objFile->path ?>" alt="" class="img-fluid">
+                    </a>
+                </figure>
+            </div>
+            <?php endforeach ?>
+        </div>
+        
+            
+
+        <!-- set image if not gallery beginn -->
+        <?php else: ?>
+        <?php if ($this->addImage): ?>
+
+            <?php  $this->insert('image', $this->arrData); ?>
+
+        <?php endif; ?>
+        <?php endif; ?>
+        <?php //dump($this->arrData['picture']['img']['src']) ?>
+        </div>
+        <div class="col-lg-6">
+            <?php if ($this->hasMetaFields): ?>
+                <p class="info"><time datetime="<?= $this->datetime ?>"><?= $this->parseDate("d.m.Y", $this->timestamp); ?></time> | <?= $name ?> <?= $this->commentCount ?></p>
+            <?php endif; ?>            
+            <h1><?= $this->newsHeadline ?></h1>
+            <?= $this->teaser ?>
+            <?php if ($this->enclosure): ?>
+                <ul class="enclosure">
+                <?php foreach ($this->enclosure as $enclosure): ?>
+                    <li class="download-element ext-<?= $enclosure['extension'] ?>">
+                    <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span class="size">(<?= $enclosure['filesize'] ?>)</span></a>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>            
+        </div>
+        <div class="col-lg-3">
+            <h2 class="h5 text-uppercase">
+                Agendagruppe
+            </h2>
+        </div>
+
+    
+
+
+
+
+
+    </div>
+</div>
+
+
+<?php
+
+$schemaOrg = $this->getSchemaOrgData();
+
+if ($this->hasText) {
+    $schemaOrg['text'] = $this->rawHtmlToPlainText($this->text);
+}
+
+$this->addSchemaOrg($schemaOrg);
